@@ -9,7 +9,7 @@ export default function App() {
     <BrowserRouter>
       <div className="min-h-screen bg-zinc-100">
         <Navbar />
-        <main className="max-w-5xl mx-auto">
+        <main className="max-w-full">
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/home" element={<Home />} />
