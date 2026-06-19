@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { CARDS, PUBLICATIONS } from '../data/cards'
 import PublicationItem from '../components/PublicationItem'
+import ContactModal from '../components/ContactModal'
 
 const FILTERS = [
   { label: 'Todos', value: 'todos' },
@@ -13,6 +14,7 @@ export default function CardPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [activeFilter, setActiveFilter] = useState('todos')
+  const [selectedPub, setSelectedPub] = useState(null)
 
   const card = CARDS.find(c => c.id === Number(id))
   const pubs = PUBLICATIONS[Number(id)] || []
@@ -125,11 +127,22 @@ export default function CardPage() {
         ) : (
           <div className="flex flex-col gap-3">
             {filteredPubs.map(pub => (
-              <PublicationItem key={pub.id} pub={pub} />
+              <PublicationItem 
+                key={pub.id} 
+                pub={pub} 
+                onContact={() => setSelectedPub(pub)} 
+              />
             ))}
           </div>
         )}
       </div>
+
+      <ContactModal
+        isOpen={selectedPub !== null}
+        onClose={() => setSelectedPub(null)}
+        pub={selectedPub}
+        card={card}
+      />
     </div>
   )
 }
