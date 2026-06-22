@@ -1,22 +1,4 @@
-import { useState, useEffect } from 'react'
-
-const MEETING_PLACES = [
-  { name: 'Los Gallegos Shopping', desc: 'Rivadavia y Diagonal Pueyrredon (Zona Centro)', icon: '🛍️' },
-  { name: 'Plaza Mitre', desc: 'San Luis y Colón (Cerca del skatepark)', icon: '🌳' },
-  { name: 'Paseo Aldrey', desc: 'Sarmiento y Alberti (Zona Comercial)', icon: '🎬' },
-  { name: 'Plaza Colón', desc: 'Boulevard Marítimo y Arenales (Frente al Casino)', icon: '🌊' },
-  { name: 'Zona Güemes', desc: 'Güemes y Rawson (En alguna cafetería)', icon: '☕' },
-  { name: 'Plaza España', desc: 'Libertad y la costa (La Perla)', icon: '🏰' },
-]
-
-const MEETING_TIMES = [
-  'Hoy por la tarde (16:00 a 19:00 hs)',
-  'Mañana por la mañana (10:00 a 13:00 hs)',
-  'Mañana por la tarde (16:00 a 19:00 hs)',
-  'Sábado por la tarde (15:00 a 18:00 hs)',
-  'Domingo por la tarde (15:00 a 18:00 hs)',
-  'Otro día y horario (a coordinar en el chat)',
-]
+import { useState } from 'react'
 
 const QUICK_MESSAGES = [
   '👋 ¡Hola! Me interesa la carta que publicaste.',
@@ -26,33 +8,20 @@ const QUICK_MESSAGES = [
 ]
 
 export default function ContactModal({ isOpen, onClose, pub, card }) {
-  const [activeTab, setActiveTab] = useState('chat') // 'chat' | 'whatsapp' | 'meeting'
-  const [messageText, setMessageText] = useState('')
-  const [selectedPlace, setSelectedPlace] = useState(MEETING_PLACES[0].name)
-  const [selectedTime, setSelectedTime] = useState(MEETING_TIMES[0])
+  const isOfrezco = pub?.mode === 'ofrezco'
+  const defaultMsg = (pub && card)
+    ? (isOfrezco 
+        ? `¡Hola ${pub.user}! Me interesa tu publicación del ${card.name} (${card.set}). ¿Sigue disponible?`
+        : `¡Hola ${pub.user}! Vi que buscás un ${card.name} (${card.set}). Tengo uno disponible para intercambio.`)
+    : ''
+
+  const [activeTab, setActiveTab] = useState('chat') // 'chat' | 'whatsapp'
+  const [messageText, setMessageText] = useState(defaultMsg)
   const [isSending, setIsSending] = useState(false)
   const [isSent, setIsSent] = useState(false)
   const [copied, setCopied] = useState(false)
-  
-  // Reset states when modal opens/closes or publication changes
-  useEffect(() => {
-    if (isOpen && pub && card) {
-      const isOfrezco = pub.mode === 'ofrezco'
-      const defaultMsg = isOfrezco 
-        ? `¡Hola ${pub.user}! Me interesa tu publicación del ${card.name} (${card.set}). ¿Sigue disponible?`
-        : `¡Hola ${pub.user}! Vi que buscás un ${card.name} (${card.set}). Tengo uno disponible para intercambio.`
-      
-      setMessageText(defaultMsg)
-      setIsSending(false)
-      setIsSent(false)
-      setCopied(false)
-      setActiveTab('chat')
-    }
-  }, [isOpen, pub, card])
 
   if (!isOpen || !pub || !card) return null
-
-  const isOfrezco = pub.mode === 'ofrezco'
 
   // Format phone for WhatsApp simulation
   const mockPhone = pub.id.replace(/[^0-9]/g, '') || '2235554321'
@@ -76,13 +45,6 @@ export default function ContactModal({ isOpen, onClose, pub, card }) {
     
     // Open in new tab (simulated / real depending on click)
     window.open(waUrl, '_blank')
-  }
-
-  // Handle meeting proposal generation
-  const handleApplyMeetingProposal = () => {
-    const proposalMsg = `¡Hola ${pub.user}! Me interesa tu publicación de ${card.name}. ¿Te parece si coordinamos para encontrarnos en ${selectedPlace} (${selectedTime}) para hacer el intercambio?`
-    setMessageText(proposalMsg)
-    setActiveTab('chat')
   }
 
   const handleCopyText = () => {
@@ -211,24 +173,10 @@ export default function ContactModal({ isOpen, onClose, pub, card }) {
                       : 'text-zinc-500 hover:text-zinc-800 hover:bg-white/40'
                   }`}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                   </svg>
                   WhatsApp Directo
-                </button>
-                <button
-                  onClick={() => setActiveTab('meeting')}
-                  className={`flex-1 py-2 text-[12.5px] font-medium rounded-md flex justify-center items-center gap-1.5 transition-all ${
-                    activeTab === 'meeting'
-                      ? 'bg-white text-[#C0392B] shadow-sm'
-                      : 'text-zinc-500 hover:text-zinc-800 hover:bg-white/40'
-                  }`}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="10" r="3"/>
-                    <path d="M12 21.7C10.3 19.8 4 12.5 4 10a8 8 0 1 1 16 0c0 2.5-6.3 9.8-8 11.7z"/>
-                  </svg>
-                  Proponer Encuentro
                 </button>
               </div>
 
@@ -358,84 +306,6 @@ export default function ContactModal({ isOpen, onClose, pub, card }) {
                         <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
                       </svg>
                       Abrir WhatsApp
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Tab: Proponer Encuentro */}
-              {activeTab === 'meeting' && (
-                <div className="space-y-4 animate-fade-in">
-                  <div className="bg-red-50 border border-red-100 rounded-xl p-3 text-[#A32D2D] text-[12.5px] leading-relaxed flex gap-2.5">
-                    <span className="text-[16px] select-none">📍</span>
-                    <div>
-                      <strong className="font-semibold block mb-0.5">Encontrarse en Mar del Plata</strong>
-                      Elegí un punto de encuentro y un horario seguro para realizar el intercambio de forma presencial.
-                    </div>
-                  </div>
-
-                  {/* Grid of Places */}
-                  <div>
-                    <label className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider block mb-2">Seleccioná un punto seguro</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {MEETING_PLACES.map((place) => (
-                        <button
-                          key={place.name}
-                          type="button"
-                          onClick={() => setSelectedPlace(place.name)}
-                          className={`p-2.5 border rounded-xl text-left transition-all flex flex-col justify-between h-[70px] ${
-                            selectedPlace === place.name
-                              ? 'border-[#C0392B] bg-red-50/20 ring-1 ring-[#C0392B]'
-                              : 'border-zinc-200 hover:bg-zinc-50'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between w-full">
-                            <span className="text-[15px]">{place.icon}</span>
-                            {selectedPlace === place.name && (
-                              <div className="w-3.5 h-3.5 rounded-full bg-[#C0392B] flex items-center justify-center text-white">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-                                  <polyline points="20 6 9 17 4 12"/>
-                                </svg>
-                              </div>
-                            )}
-                          </div>
-                          <div>
-                            <div className="font-semibold text-zinc-800 text-[11.5px] leading-tight truncate">{place.name}</div>
-                            <div className="text-[9.5px] text-zinc-400 truncate mt-0.5">{place.desc}</div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Time Selector */}
-                  <div>
-                    <label htmlFor="meeting-time" className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider block mb-1.5">Propuesta de día y horario</label>
-                    <select
-                      id="meeting-time"
-                      value={selectedTime}
-                      onChange={(e) => setSelectedTime(e.target.value)}
-                      className="w-full border border-zinc-200 rounded-lg p-2.5 text-[13px] text-zinc-800 bg-zinc-50 outline-none focus:border-[#C0392B] focus:bg-white transition-all"
-                    >
-                      {MEETING_TIMES.map((time, idx) => (
-                        <option key={idx} value={time}>
-                          {time}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Apply Proposal */}
-                  <div className="pt-2">
-                    <button
-                      type="button"
-                      onClick={handleApplyMeetingProposal}
-                      className="w-full bg-[#C0392B] hover:bg-[#A93226] text-white rounded-lg py-2.5 text-[13.5px] font-medium flex items-center justify-center gap-2 transition-colors shadow-sm"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12"/>
-                      </svg>
-                      Generar Mensaje de Encuentro
                     </button>
                   </div>
                 </div>

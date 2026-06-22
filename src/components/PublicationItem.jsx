@@ -24,17 +24,18 @@ export default function PublicationItem({ pub, onContact }) {
 
         <div className="mt-2 text-[13px] text-zinc-600 leading-relaxed">{pub.note}</div>
 
+        {pub.photo && (
+          <div className="mt-3">
+            <img
+              src={pub.photo}
+              alt={`Foto de ${pub.user}`}
+              className="w-40 h-28 object-cover rounded-lg border border-zinc-200"
+            />
+          </div>
+        )}
+
         {pub.wants && pub.wants.length > 0 && (
-          <div className="mt-2">
-            {pub.photo && (
-              <div className="mt-3">
-                <img
-                  src={pub.photo}
-                  alt={`Foto de ${pub.user}`}
-                  className="w-40 h-28 object-cover rounded-lg border border-zinc-200"
-                />
-              </div>
-              )}
+          <div className="mt-3">
             <div className="text-[11px] text-zinc-400 mb-1">Busca a cambio:</div>
             <div className="flex flex-wrap gap-1.5">
               {pub.wants.map((w, i) => (
